@@ -1,0 +1,21 @@
+JOSYS_MEMBERS_FILENAME = "josys_members.csv"
+JOSYS_DEVICES_FILENAME = "josys_devices.csv"
+SOURCE_MEMBERS_FILENAME = "source_members.csv"
+SOURCE_DEVICES_FILENAME = "source_devices.csv"
+NEW_MEMBERS_FILENAME = "new_members.csv"
+UPDATED_MEMBERS_FILENAME = "updated_members.csv"
+NEW_DEVICES_FILENAME = "new_devices.csv"
+UPDATED_DEVICES_FILENAME = "updated_devices.csv"
+
+COMMAND_GET_JOSYS_MEMBERS = "getJosysMembers"
+COMMAND_GET_SOURCE_MEMBERS = "getSourceMembers"
+COMMAND_COMPARE_MEMBERS = "compareMembers"
+COMMAND_SYNC_MEMBERS_FROM_FILE = "syncMembersFromFile"
+COMMAND_SYNC_MEMBERS_FROM_API = "syncMembersFromAPI"
+
+COMMAND_GET_JOSYS_DEVICES = "getJosysDevices"
+COMMAND_GET_SOURCE_DEVICES = "getSourceDevices"
+COMMAND_COMPARE_DEVICES = "compareDevices"
+COMMAND_SYNC_DEVICES = "syncDevices"
+
+CONFIG_FILENAME = "integration_config.yaml"

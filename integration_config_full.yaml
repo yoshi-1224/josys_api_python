@@ -1,0 +1,63 @@
+josys_credentials:
+  ## ユーザーキーと、APIキーを管理画面から取得してください
+  user_key: 'xxx'
+  api_key: 'xxx'
+devices:
+  # 利用するソースに応じて、値を変更してください
+  source: 'lanscope'
+  source_credentials:
+    ############## lanscopeの場合 ##############
+    api_token: 'xxx'
+  source_columns:
+    asset_no: '資産番号'
+    device_type: 'デバイスタイプ'
+    device_name: 'デバイス名'
+    os_version: 'OSバージョン'
+    managed_device_name: 'デバイス管理名'
+  josys_columns:
+    asset_number: '資産番号'
+    device_type: 'デバイスの種類'
+    status: 'ステータス'
+    operating_system: 'OS'
+    manufacturer: 'メーカー'
+    serial_number: 'シリアル番号'
+    model_number: 'デバイス名'
+  column_mappings:
+    資産番号: '資産番号'
+    デバイスの種類: 'デバイスの種類'
+  match_key: 資産番号
+  asset_number_key: 資産番号
+members:
+  # 利用するソースに応じて、値を変更してください
+  source: 'hennge'
+  source_credentials:
+    ############# henngeの場合 #############
+    client_id: 'xxx'
+    client_secret: 'xxx'
+  josys_columns:
+    first_name: '名'
+    last_name: '姓'
+    email: 'メールアドレス'
+    user_id: '従業員番号'
+    status: 'ステータス'
+    job_title: '役職'
+    username: 'ユーザー名'
+    personal_email: '個人メールアドレス'
+    start_date: '入社日'
+    end_date: '退職日'
+    user_category: 'メンバー種別'
+    additional_information: 'メモ'
+  source_columns:
+    Username: 'ユーザー名'
+    Email: 'メールアドレス'
+    'Display Name': '表示名'
+    'Family Name': '姓'
+    'Given Name': '名'
+    Status: 'ステータス'
+  match_key: メールアドレス
+  column_mappings:
+    メールアドレス: 'メールアドレス'
+    姓: '姓'
+    名: '名'
+    ステータス: 'ステータス'
+    退職日: '退職日'
