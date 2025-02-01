@@ -34,83 +34,83 @@ class HenngeApiClient:
         else:
             raise Exception(f"Failed to obtain access token: {response.status_code} {response.text}")
         
-    # def _make_api_request(self, endpoint, method='get', post_data=None):
-    #     if post_data is None:
-    #         post_data = {}
-    #     url = f"{self.api_endpoint}{endpoint}"
-    #     print(f"{url}")
-    #     headers = {
-    #         'Authorization': f"Bearer {self._get_access_token()}",
-    #     }
+    def _make_api_request(self, endpoint, method='get', post_data=None):
+        if post_data is None:
+            post_data = {}
+        url = f"{self.api_endpoint}{endpoint}"
+        print(f"{url}")
+        headers = {
+            'Authorization': f"Bearer {self._get_access_token()}",
+        }
 
-    #     if method.lower() in ['post', 'put', 'patch'] and post_data:
-    #         response = requests.request(method, url, headers=headers, json=post_data)
-    #     else:
-    #         response = requests.request(method, url, headers=headers)
-    #     if response.status_code in [200, 201]:
-    #         if 'application/json' in response.headers.get('Content-Type', ''):
-    #             return {
-    #                 'content': response.json(),
-    #                 'headers': response.headers
-    #             }
-    #         else:
-    #             return {
-    #                 'content': None,
-    #                 'headers': response.headers
-    #             }
-    #     elif response.status_code == 401:
-    #         print("INVALID TOKEN")
-    #         return None
-    #     elif response.status_code == 404:
-    #         print("404 Not Found")
-    #         return None
-    #     else:
-    #         response.raise_for_status()
+        if method.lower() in ['post', 'put', 'patch'] and post_data:
+            response = requests.request(method, url, headers=headers, json=post_data)
+        else:
+            response = requests.request(method, url, headers=headers)
+        if response.status_code in [200, 201]:
+            if 'application/json' in response.headers.get('Content-Type', ''):
+                return {
+                    'content': response.json(),
+                    'headers': response.headers
+                }
+            else:
+                return {
+                    'content': None,
+                    'headers': response.headers
+                }
+        elif response.status_code == 401:
+            print("INVALID TOKEN")
+            return None
+        elif response.status_code == 404:
+            print("404 Not Found")
+            return None
+        else:
+            response.raise_for_status()
     
-    # def _paginate_through(self, endpoint, method='get', post_data=None):
-    #     if post_data is None:
-    #         post_data = {}
-    #     results = []
-    #     cursor = None
-    #     while True:
-    #         if cursor:
-    #             cursor_param = f"cursor={cursor}"
-    #             url = f"{endpoint}&{cursor_param}" if '?' in endpoint else f"{endpoint}?{cursor_param}"
-    #         else:
-    #             url = endpoint
-    #         if method.lower() == 'get':
-    #             response = self._make_api_request(url)
-    #         else:
-    #             response = self._make_api_request(url, method, post_data)
-    #         if not response:
-    #             break
-    #         cursor = response['content'].get('cursor')
-    #         items = response['content'].get('items', [])
-    #         results.extend(items)
-    #         if not cursor:
-    #             break
-    #         print(results)
-    #     return results
-
-    # def get_members(self):
-    #     results = self._paginate_through('/20230822/users', 'get')
-    #     if not results:
-    #         return []
-    #     return results
+    def _paginate_through(self, endpoint, method='get', post_data=None):
+        if post_data is None:
+            post_data = {}
+        results = []
+        cursor = None
+        while True:
+            if cursor:
+                cursor_param = f"cursor={cursor}"
+                url = f"{endpoint}&{cursor_param}" if '?' in endpoint else f"{endpoint}?{cursor_param}"
+            else:
+                url = endpoint
+            if method.lower() == 'get':
+                response = self._make_api_request(url)
+            else:
+                response = self._make_api_request(url, method, post_data)
+            if not response:
+                break
+            cursor = response['content'].get('cursor')
+            items = response['content'].get('items', [])
+            results.extend(items)
+            if not cursor:
+                break
+            print(results)
+        return results
 
     def get_members(self):
-        endpoint = f"{self.api_endpoint}/20230822/users/download/csv"
-        headers = {
-            'Accept': 'application/json',
-            'Authorization': f'Bearer {self._get_access_token()}'
-        }
-        response = requests.get(endpoint, headers=headers)
-
-        if response.status_code != 200:
-            print(f"Failed to download CSV: {response.status_code}")
+        results = self._paginate_through('/20230822/users', 'get')
+        if not results:
             return []
+        return results
 
-        csv_content = response.content.decode('utf-8')
-        csv_reader = csv.DictReader(io.StringIO(csv_content))
-        users = [row for row in csv_reader]
-        return users
+    # def get_members(self):
+    #     endpoint = f"{self.api_endpoint}/20230822/users/download/csv"
+    #     headers = {
+    #         'Accept': 'application/json',
+    #         'Authorization': f'Bearer {self._get_access_token()}'
+    #     }
+    #     response = requests.get(endpoint, headers=headers)
+
+    #     if response.status_code != 200:
+    #         print(f"Failed to download CSV: {response.status_code}")
+    #         return []
+
+    #     csv_content = response.content.decode('utf-8')
+    #     csv_reader = csv.DictReader(io.StringIO(csv_content))
+    #     users = [row for row in csv_reader]
+    #     return users

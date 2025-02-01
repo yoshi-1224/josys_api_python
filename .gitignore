@@ -1,3 +1,5 @@
 *.csv
 integration_config.yaml
 .venv/
+myenv/
+__pycache__/

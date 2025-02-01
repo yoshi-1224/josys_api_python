@@ -26,12 +26,12 @@ def _get_hennge_columns(config):
 def _custom_functions_per_item():
     functions = []
     def convert_to_josys_status(member):
-        if member.get("ステータス") == "enabled":
+        from datetime import datetime
+        if member.get("ステータス") != True:
             member["ステータス"] = "在籍中"
             member["退職日"] = None
         else:
             member["ステータス"] = "退職済"
-            from datetime import datetime
             member["退職日"] = datetime.now().strftime("%Y-%m-%d")
         return member
     
