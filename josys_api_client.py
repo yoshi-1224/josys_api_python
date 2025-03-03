@@ -107,6 +107,10 @@ class JosysApiClient:
                 break
         return result
     
+    def get_departments(self, perPage=1000):
+        results = self._paginateThrough('/v1/departments', perPage)
+        return results
+
     def searchUserProfiles(self, searchParams, perPage=500, returnEnumsInJapanese=True, getDepartmentNames=True):
         results = self._paginateThrough('/v2/user_profiles/search', perPage, 'post', searchParams)
         if not results:
@@ -117,8 +121,36 @@ class JosysApiClient:
                 self._convertUserProfileEnumsToJapanese(profile)
 
         if getDepartmentNames:
-            pass
+            departments = self.get_departments()
+            self._append_departments(results, departments)
         return results
+    
+    def _append_departments(self, user_profiles, departments):
+        results = self._construct_department_paths(departments)
+        for profile in user_profiles:
+            if len(profile.get('department_uuids', [])) == 0:
+                continue
+            profile['department_names'] = [results[uuid] for uuid in profile['department_uuids']]
+
+    def _construct_department_paths(self, departments):
+        department_map = {dept['uuid']: dept for dept in departments}
+
+        def get_full_path(uuid, path=None):
+            if path is None:
+                path = []
+            dept = department_map.get(uuid)
+            if not dept:
+                return '/'.join(path)
+            path.insert(0, dept['name'])
+            if dept.get('parent_department_uuid'):
+                return get_full_path(dept['parent_department_uuid'], path)
+            return '/'.join(path)
+
+        full_path_dictionary = {}
+        for dept in departments:
+            full_path_dictionary[dept['uuid']] = get_full_path(dept['uuid'])
+        return full_path_dictionary
+
 
     # Device endpoints
     def search_devices(self, searchParams, perPage=100, returnCustomFields=True, returnMdmFields=True, returnEnumsInJapanese=True):
@@ -229,15 +261,6 @@ deviceStatusMappingEn2Jp = {
     "DECOMMISSIONED": "廃棄/解約",
     "UNKNOWN": "不明"
 }
-
-# userProfileStatusMappingEn2Jp = {
-#     "ONBOARD_INITIATED": "入社前",
-#     "ONBOARDED": "在籍中",
-#     "TEMPORARY_LEAVE":"休職中",
-#     "OFFBOARD_INITIATED": "退職済",
-#     "UNKNOWN": "不明",
-#     "OTHERS": "その他",
-# }
 
 userProfileStatusMappingEn2Jp = {
     "INITIATED": "入社前",
