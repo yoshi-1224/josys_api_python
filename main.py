@@ -60,6 +60,8 @@ def main():
         josys_members = load_csv_as_objects(JOSYS_MEMBERS_FILENAME)
         source_members = load_csv_as_objects(SOURCE_MEMBERS_FILENAME)
         new_members, updated_members = compute_member_diffs(josys_members, source_members, config)
+        save_objects_to_csv(new_members, NEW_MEMBERS_FILENAME)
+        save_objects_to_csv(updated_members, UPDATED_MEMBERS_FILENAME)
         if "部署" in config["members"]["column_mappings"]:
             print(f"部署情報を{JOSYS_DEPARTMENTS_FILENAME}から読み込んでいます")
             department_lookup = {}
@@ -136,7 +138,7 @@ def upload_new_members(new_members):
     for i in range(len(new_members)):
         new_members[i]["api_result"] = results[i]
     save_objects_to_csv(new_members, NEW_MEMBERS_API_RESULT_FILENAME)
-    print(f"結果は{NEW_MEMBERS_FILENAME}で確認可能です")
+    print(f"結果は{NEW_MEMBERS_API_RESULT_FILENAME}で確認可能です")
 
 def update_members(members):
     if len(members) == 0:
@@ -146,7 +148,7 @@ def update_members(members):
     for i in range(len(members)):
         members[i]["api_result"] = results[i]
     save_objects_to_csv(members, UPDATED_MEMBERS_API_RESULT_FILENAME)
-    print(f"結果は{UPDATED_MEMBERS_FILENAME}で確認可能です")
+    print(f"結果は{UPDATED_MEMBERS_API_RESULT_FILENAME}で確認可能です")
 
 def upload_new_devices(new_devices):
     pass
