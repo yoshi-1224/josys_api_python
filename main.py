@@ -41,6 +41,7 @@ def main():
     elif user_input == COMMAND_GET_JOSYS_MEMBERS:
         josys_controller.setup_api_client(config)
         fetch_josys_members(config)
+        fetch_josys_departments()
         return
     elif user_input == COMMAND_GET_SOURCE_MEMBERS:
         fetch_source_members(config)
@@ -56,35 +57,42 @@ def main():
         josys_controller.setup_api_client(config)
         if user_input == COMMAND_SYNC_MEMBERS_FROM_API:
             fetch_josys_members(config)
+            fetch_josys_departments()
             fetch_source_members(config)
         josys_members = load_csv_as_objects(JOSYS_MEMBERS_FILENAME)
         source_members = load_csv_as_objects(SOURCE_MEMBERS_FILENAME)
         new_members, updated_members = compute_member_diffs(josys_members, source_members, config)
         save_objects_to_csv(new_members, NEW_MEMBERS_FILENAME)
         save_objects_to_csv(updated_members, UPDATED_MEMBERS_FILENAME)
+        new_members = load_csv_as_objects(NEW_MEMBERS_FILENAME)
+        updated_members = load_csv_as_objects(UPDATED_MEMBERS_FILENAME)
         if "部署" in config["members"]["column_mappings"]:
             print(f"部署情報を{JOSYS_DEPARTMENTS_FILENAME}から読み込んでいます")
-            department_lookup = {}
-            with open(JOSYS_DEPARTMENTS_FILENAME, mode='r', encoding='utf-8') as file:
-                import csv
-                reader = csv.reader(file)
-                next(reader)
-                for row in reader:
-                    if len(row) >= 2:
-                        department_lookup[row[0]] = row[1]
+            department_lookup = load_departments(JOSYS_DEPARTMENTS_FILENAME)
             change_department_names_to_uuids(new_members, department_lookup)
             change_department_names_to_uuids(updated_members, department_lookup)
         upload_new_members(new_members)
         update_members(updated_members)
         return
+    
+def load_departments(filename):
+    department_lookup = {}
+    with open(filename, mode='r', encoding='utf-8') as file:
+        import csv
+        reader = csv.reader(file)
+        next(reader)
+        for row in reader:
+            if len(row) >= 2:
+                department_lookup[row[0]] = row[1]
+    return department_lookup
 
 def change_department_names_to_uuids(members, department_lookup):
     if not department_lookup:
         return
     for m in members:
-        uuid = department_lookup.get(m['部署'], None) # compute_diffsから
+        uuid = department_lookup.get(m['department'], None)
         m['department_uuids'] = [uuid]
-        del m['部署']
+        del m['department']
     return
 
 def fetch_josys_devices(config):
@@ -94,10 +102,14 @@ def fetch_josys_devices(config):
 
 def fetch_josys_members(config):
     print(f"ジョーシスからメンバーを取得します")
-    josys_members, department_lookups = josys_controller.get_josys_members(config)
+    josys_members = josys_controller.get_josys_members(config)
     save_objects_to_csv(josys_members, JOSYS_MEMBERS_FILENAME)
-    save_dic_as_csv(department_lookups, JOSYS_DEPARTMENTS_FILENAME)
     return josys_members
+
+def fetch_josys_departments():
+    print(f"ジョーシスから部署一覧を取得します")
+    josys_departments = josys_controller.get_josys_departments()
+    save_dic_as_csv(josys_departments, JOSYS_DEPARTMENTS_FILENAME)
 
 def fetch_source_devices(config):
     supported_sources = ["lanscope"]
@@ -196,7 +208,7 @@ def save_dic_as_csv(input, filename):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for key, value in input.items():
-            writer.writerow({"department_names": key, "department_uuids": value})
+            writer.writerow({"department_names": value, "department_uuids": key})
 
     print(f"->{filename}に部署一覧を保存しました")
 

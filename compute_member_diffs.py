@@ -107,8 +107,7 @@ def compute_member_diffs(josys_members, source_members, josys_columns, source_co
         "メンバー種別": "user_category",
         "ユーザー名": "username",
         "メモ": "additional_information",
-        # "部署": "department_uuids"
-        # "部署": "department_name"
+        "部署": "department" # これはPOST/PATCH時にuuidに変換する
     }
     rename_keys(members_to_add, jp2en_mapping)
     rename_keys(members_to_update, jp2en_mapping)

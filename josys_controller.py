@@ -43,13 +43,6 @@ def get_josys_members(config):
         return
     column_names, output_column_names = _get_josys_columns(config, "members")
 
-    department_lookup = {}
-    if "department_uuids" in column_names:
-        print("部署一覧を作成します")
-        for member in results:
-            for name, uuid in zip(member.get("department_names", []), member.get("department_uuids", [])):
-                department_lookup[name] = uuid
-
     for member in results:
         if "department_names" in member:
             member["department_names"] = member["department_names"][0] if member["department_names"] else ""
@@ -61,7 +54,11 @@ def get_josys_members(config):
         for member in results
     ]
 
-    return results, department_lookup
+    return results
+
+def get_josys_departments():
+    global josys_api_client
+    return josys_api_client.getDepartments()
 
 def _get_josys_columns(config, object_type):
     keys = list(config[object_type]['josys_columns'].keys())

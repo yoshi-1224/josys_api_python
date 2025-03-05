@@ -107,9 +107,13 @@ class JosysApiClient:
                 break
         return result
     
-    def get_departments(self, perPage=1000):
+    def _get_departments(self, perPage=1000):
         results = self._paginateThrough('/v1/departments', perPage)
         return results
+    
+    def getDepartments(self, perPage=1000):
+        results = self._get_departments()
+        return self._construct_department_paths(results)
 
     def searchUserProfiles(self, searchParams, perPage=500, returnEnumsInJapanese=True, getDepartmentNames=True):
         results = self._paginateThrough('/v2/user_profiles/search', perPage, 'post', searchParams)
@@ -121,7 +125,7 @@ class JosysApiClient:
                 self._convertUserProfileEnumsToJapanese(profile)
 
         if getDepartmentNames:
-            departments = self.get_departments()
+            departments = self._get_departments()
             self._append_departments(results, departments)
         return results
     
