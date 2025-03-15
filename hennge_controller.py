@@ -8,6 +8,7 @@ def get_hennge_members(config):
     results = HenngeApiClient(client_id, client_secret).get_members()
     if not results:
         return
+    _flatten_custom_attributes(results)
     column_names, output_column_names = _get_hennge_columns(config)
     results = [
         {output_column_names[column_names.index(key)]: value for key, value in member.items() if key in column_names}
@@ -23,11 +24,17 @@ def _get_hennge_columns(config):
     values = [config["members"]['source_columns'][key] for key in keys]
     return keys, values
 
+def _flatten_custom_attributes(results):
+    for member in results:
+        custom_attributes = member.pop("custom_attributes", {})
+        for key, value in custom_attributes.items():
+            member[key] = value
+
 def _custom_functions_per_item():
     functions = []
     def convert_to_josys_status(member):
         from datetime import datetime
-        if member.get("ステータス") != True:
+        if not member.get("ステータス"):
             member["ステータス"] = "在籍中"
             member["退職日"] = None
         else:

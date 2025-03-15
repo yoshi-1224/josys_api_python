@@ -178,17 +178,22 @@ def compute_member_diffs(josys_members, source_members, config):
 def load_csv_as_objects(filename):
     import csv
     objects = []
-    with open(filename, mode='r', encoding='utf-8') as file:
-        csv_reader = csv.DictReader(file)
-        for row in csv_reader:
-            objects.append(row)
+    try:
+        with open(filename, mode='r', encoding='utf-8') as file:
+            csv_reader = csv.DictReader(file)
+            for row in csv_reader:
+                objects.append(row)
+    except FileNotFoundError:
+        return []
     return objects
 
 def save_objects_to_csv(objects, filename):
-    if not objects:
-        return
     import csv
     with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
+        if not objects:
+            csvfile.write('')
+            print(f"->{filename}に結果を保存しました")
+            return
         all_fieldnames = set()
         for obj in objects:
             all_fieldnames.update(obj.keys())
